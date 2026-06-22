@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Profile Card Generator - Premium Studio</title>
+    <title>CardCraft - Premium Profile card Studio</title>
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -14,7 +14,8 @@
     <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
-    <!-- Background abstract shapes -->
+    <!-- Background visual nodes -->
+    <div class="theme-background-wrapper" id="theme-bg-nodes"></div>
     <div class="bg-glow bg-glow-1"></div>
     <div class="bg-glow bg-glow-2"></div>
 
@@ -25,14 +26,14 @@
                 <i class="fa-solid fa-id-card logo-icon"></i>
                 <span class="logo-text">CardCraft</span>
             </div>
-            <p class="subtitle">Create and curate professional digital identity cards instantly.</p>
+            <p class="subtitle">Design and export your professional digital profile identity card.</p>
         </header>
 
-        <!-- Main Workspace -->
+        <!-- Workspace Workspace -->
         <div class="workspace">
             <!-- Form Panel -->
             <section class="form-panel">
-                <h2 class="section-title"><i class="fa-solid fa-sliders"></i> Profile Configuration</h2>
+                <h2 class="section-title"><i class="fa-solid fa-sliders"></i> Configuration</h2>
                 
                 <form id="profile-form">
                     <div class="form-group">
@@ -53,12 +54,37 @@
                     <div class="form-group">
                         <label for="input-avatar">Avatar Image URL</label>
                         <input type="url" id="input-avatar" placeholder="e.g. https://images.unsplash.com/photo-...">
-                        <span class="input-helper">Leave empty for a beautiful custom letter avatar</span>
+                        <span class="input-helper">Leave empty for initials-based placeholder</span>
                     </div>
 
                     <div class="form-group">
                         <label for="input-skills">Skills (comma-separated)</label>
                         <input type="text" id="input-skills" placeholder="e.g. React, Python, UI/UX, GraphQL">
+                    </div>
+
+                    <!-- Social Handles Section -->
+                    <div class="social-form-section">
+                        <span class="social-section-header">Social Profiles (Optional)</span>
+                        <div class="form-group-row">
+                            <div class="form-group">
+                                <label for="input-github"><i class="fa-brands fa-github"></i> GitHub</label>
+                                <input type="url" id="input-github" placeholder="https://github.com/...">
+                            </div>
+                            <div class="form-group">
+                                <label for="input-linkedin"><i class="fa-brands fa-linkedin-in"></i> LinkedIn</label>
+                                <input type="url" id="input-linkedin" placeholder="https://linkedin.com/in/...">
+                            </div>
+                        </div>
+                        <div class="form-group-row">
+                            <div class="form-group">
+                                <label for="input-twitter"><i class="fa-brands fa-twitter"></i> Twitter</label>
+                                <input type="url" id="input-twitter" placeholder="https://twitter.com/...">
+                            </div>
+                            <div class="form-group">
+                                <label for="input-portfolio"><i class="fa-solid fa-globe"></i> Website</label>
+                                <input type="url" id="input-portfolio" placeholder="https://...">
+                            </div>
+                        </div>
                     </div>
 
                     <div class="form-group">
@@ -92,7 +118,7 @@
                     </div>
 
                     <button type="submit" class="submit-btn" id="submit-btn">
-                        <i class="fa-solid fa-wand-magic-sparkles"></i> Save to Studio History
+                        <i class="fa-solid fa-save"></i> Save Profile
                     </button>
                 </form>
             </section>
@@ -126,14 +152,22 @@
                                 <span class="brand-tag">
                                     <i class="fa-solid fa-shield-halved"></i> Verified Identity
                                 </span>
-                                <div class="social-links">
-                                    <a href="#" onclick="event.preventDefault();"><i class="fa-brands fa-github"></i></a>
-                                    <a href="#" onclick="event.preventDefault();"><i class="fa-brands fa-linkedin-in"></i></a>
-                                    <a href="#" onclick="event.preventDefault();"><i class="fa-brands fa-twitter"></i></a>
+                                <div class="social-links" id="card-socials">
+                                    <a href="#" class="hidden" id="link-github" target="_blank"><i class="fa-brands fa-github"></i></a>
+                                    <a href="#" class="hidden" id="link-linkedin" target="_blank"><i class="fa-brands fa-linkedin-in"></i></a>
+                                    <a href="#" class="hidden" id="link-twitter" target="_blank"><i class="fa-brands fa-twitter"></i></a>
+                                    <a href="#" class="hidden" id="link-portfolio" target="_blank"><i class="fa-solid fa-globe"></i></a>
                                 </div>
                             </div>
                         </div>
                     </div>
+                </div>
+
+                <!-- Export download button -->
+                <div class="export-actions">
+                    <button type="button" class="download-card-btn" id="download-btn">
+                        <i class="fa-solid fa-download"></i> Export Card as PNG
+                    </button>
                 </div>
             </section>
         </div>
@@ -142,7 +176,6 @@
         <section class="history-section">
             <h2 class="section-title"><i class="fa-solid fa-clock-rotate-left"></i> Generated Cards Registry</h2>
             <div class="history-grid" id="history-grid">
-                <!-- Loaded via JS -->
                 <div class="loading-history">
                     <i class="fa-solid fa-spinner fa-spin"></i> Loading registry logs...
                 </div>
@@ -150,6 +183,8 @@
         </section>
     </div>
 
+    <!-- html2canvas CDN for PNG downloads -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <!-- Custom Script -->
     <script src="/static/app.js"></script>
 </body>

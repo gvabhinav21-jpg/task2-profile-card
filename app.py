@@ -14,8 +14,10 @@ def get_db_connection():
 def init_db():
     conn = get_db_connection()
     cursor = conn.cursor()
+    # Re-initialize table with upgraded fields
+    cursor.execute('DROP TABLE IF EXISTS profiles')
     cursor.execute('''
-        CREATE TABLE IF NOT EXISTS profiles (
+        CREATE TABLE profiles (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             name TEXT NOT NULL,
             job_title TEXT NOT NULL,
@@ -23,6 +25,10 @@ def init_db():
             avatar_url TEXT,
             skills TEXT,
             theme TEXT DEFAULT 'glass',
+            github TEXT DEFAULT '',
+            linkedin TEXT DEFAULT '',
+            twitter TEXT DEFAULT '',
+            portfolio TEXT DEFAULT '',
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
     ''')
@@ -50,6 +56,10 @@ def get_profiles():
                 'avatar_url': profile['avatar_url'],
                 'skills': profile['skills'],
                 'theme': profile['theme'],
+                'github': profile['github'],
+                'linkedin': profile['linkedin'],
+                'twitter': profile['twitter'],
+                'portfolio': profile['portfolio'],
                 'created_at': profile['created_at']
             })
         return jsonify(profiles_list)
@@ -64,8 +74,12 @@ def create_profile():
         job_title = data.get('job_title', '').strip()
         bio = data.get('bio', '').strip()
         avatar_url = data.get('avatar_url', '').strip()
-        skills = data.get('skills', '').strip()  # Comma separated
+        skills = data.get('skills', '').strip()
         theme = data.get('theme', 'glass').strip()
+        github = data.get('github', '').strip()
+        linkedin = data.get('linkedin', '').strip()
+        twitter = data.get('twitter', '').strip()
+        portfolio = data.get('portfolio', '').strip()
         
         if not name:
             return jsonify({'error': 'Name is required'}), 400
@@ -75,9 +89,9 @@ def create_profile():
         conn = get_db_connection()
         cursor = conn.cursor()
         cursor.execute('''
-            INSERT INTO profiles (name, job_title, bio, avatar_url, skills, theme)
-            VALUES (?, ?, ?, ?, ?, ?)
-        ''', (name, job_title, bio, avatar_url, skills, theme))
+            INSERT INTO profiles (name, job_title, bio, avatar_url, skills, theme, github, linkedin, twitter, portfolio)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ''', (name, job_title, bio, avatar_url, skills, theme, github, linkedin, twitter, portfolio))
         profile_id = cursor.lastrowid
         conn.commit()
         
@@ -92,6 +106,10 @@ def create_profile():
             'avatar_url': profile['avatar_url'],
             'skills': profile['skills'],
             'theme': profile['theme'],
+            'github': profile['github'],
+            'linkedin': profile['linkedin'],
+            'twitter': profile['twitter'],
+            'portfolio': profile['portfolio'],
             'created_at': profile['created_at']
         }), 201
     except Exception as e:
@@ -99,5 +117,4 @@ def create_profile():
 
 if __name__ == '__main__':
     init_db()
-    # Run on Port 5002
     app.run(host='127.0.0.1', port=5002, debug=True)

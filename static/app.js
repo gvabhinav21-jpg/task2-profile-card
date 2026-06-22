@@ -5,9 +5,17 @@ document.addEventListener('DOMContentLoaded', () => {
     const inputBio = document.getElementById('input-bio');
     const inputAvatar = document.getElementById('input-avatar');
     const inputSkills = document.getElementById('input-skills');
+    
+    // Social Inputs
+    const inputGithub = document.getElementById('input-github');
+    const inputLinkedin = document.getElementById('input-linkedin');
+    const inputTwitter = document.getElementById('input-twitter');
+    const inputPortfolio = document.getElementById('input-portfolio');
+    
     const themeRadios = document.getElementsByName('theme-radio');
     const profileForm = document.getElementById('profile-form');
     const submitBtn = document.getElementById('submit-btn');
+    const downloadBtn = document.getElementById('download-btn');
 
     // Live preview elements
     const liveCard = document.getElementById('live-card');
@@ -17,18 +25,30 @@ document.addEventListener('DOMContentLoaded', () => {
     const cardAvatar = document.getElementById('card-avatar');
     const cardAvatarFallback = document.getElementById('card-avatar-fallback');
     const cardSkills = document.getElementById('card-skills');
+    
+    // Social Anchors inside card
+    const linkGithub = document.getElementById('link-github');
+    const linkLinkedin = document.getElementById('link-linkedin');
+    const linkTwitter = document.getElementById('link-twitter');
+    const linkPortfolio = document.getElementById('link-portfolio');
 
     // History elements
     const historyGrid = document.getElementById('history-grid');
 
     let historyData = [];
 
-    // Setup input listeners for real-time binding
+    // Real-time input binding listeners
     inputName.addEventListener('input', updateCardName);
     inputTitle.addEventListener('input', updateCardTitle);
     inputBio.addEventListener('input', updateCardBio);
     inputAvatar.addEventListener('input', updateCardAvatar);
     inputSkills.addEventListener('input', updateCardSkills);
+    
+    // Social bindings
+    inputGithub.addEventListener('input', () => updateSocialLink(inputGithub, linkGithub));
+    inputLinkedin.addEventListener('input', () => updateSocialLink(inputLinkedin, linkLinkedin));
+    inputTwitter.addEventListener('input', () => updateSocialLink(inputTwitter, linkTwitter));
+    inputPortfolio.addEventListener('input', () => updateSocialLink(inputPortfolio, linkPortfolio));
 
     themeRadios.forEach(radio => {
         radio.addEventListener('change', (e) => {
@@ -36,7 +56,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // Get initials for avatar fallback
+    // Helper: get name initials for fallback avatar
     function getInitials(name) {
         if (!name) return 'RS';
         const parts = name.trim().split(/\s+/);
@@ -44,21 +64,24 @@ document.addEventListener('DOMContentLoaded', () => {
         return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
     }
 
-    // Live updates
+    // Dynamic UI updates
     function updateCardName() {
         const value = inputName.value.trim();
         cardName.textContent = value || 'Your Name';
         cardAvatarFallback.textContent = getInitials(value);
     }
 
+    // Dynamic Title
     function updateCardTitle() {
         cardTitle.textContent = inputTitle.value.trim() || 'Professional Title';
     }
 
+    // Dynamic Bio
     function updateCardBio() {
         cardBio.textContent = inputBio.value.trim() || 'Your story will appear here. Start typing in the form to see your card update live in real-time!';
     }
 
+    // Dynamic Avatar
     function updateCardAvatar() {
         const url = inputAvatar.value.trim();
         if (url && (url.startsWith('http://') || url.startsWith('https://'))) {
@@ -67,7 +90,6 @@ document.addEventListener('DOMContentLoaded', () => {
             cardAvatarFallback.classList.add('hidden');
             
             cardAvatar.onerror = () => {
-                // If image fails to load, fallback to initials
                 cardAvatar.classList.add('hidden');
                 cardAvatarFallback.classList.remove('hidden');
             };
@@ -77,12 +99,12 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    // Dynamic Skills
     function updateCardSkills() {
         const skillsText = inputSkills.value.trim();
         cardSkills.innerHTML = '';
         
         if (!skillsText) {
-            // Default skills if empty
             ['HTML5', 'CSS3', 'JavaScript'].forEach(s => {
                 const badge = document.createElement('span');
                 badge.className = 'skill-badge';
@@ -104,16 +126,63 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // Dynamic Social anchors
+    function updateSocialLink(inputEl, anchorEl) {
+        const val = inputEl.value.trim();
+        if (val && (val.startsWith('http://') || val.startsWith('https://'))) {
+            anchorEl.href = val;
+            anchorEl.classList.remove('hidden');
+        } else {
+            anchorEl.classList.add('hidden');
+        }
+    }
+
+    // Dynamic Theme transitions
     function updateCardTheme(themeName) {
-        // Remove old theme classes
         liveCard.className = 'profile-card';
         liveCard.classList.add(`theme-${themeName}`);
         
-        // Add animation pop effect
+        // Add subtle background mood lighting changes
+        const themeBgColors = {
+            'glass': '#0a0e17',
+            'dark-neon': '#040710',
+            'royal-gold': '#050a12',
+            'ocean-breeze': '#012035'
+        };
+        document.body.style.backgroundColor = themeBgColors[themeName] || '#0a0e17';
+
+        // Animate pop entry
         liveCard.classList.remove('animate-pop');
-        void liveCard.offsetWidth; // Trigger reflow
+        void liveCard.offsetWidth; 
         liveCard.classList.add('animate-pop');
     }
+
+    // Export profile card image using html2canvas
+    downloadBtn.addEventListener('click', () => {
+        const name = inputName.value.trim() || 'profile';
+        
+        // Display loading feedback
+        downloadBtn.disabled = true;
+        downloadBtn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Rendering image...';
+
+        html2canvas(liveCard, {
+            useCORS: true,
+            allowTaint: true,
+            backgroundColor: null,
+            scale: 2 // High resolution scale
+        }).then(canvas => {
+            const link = document.createElement('a');
+            link.download = `${name.replace(/\s+/g, '_')}_identity_card.png`;
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        }).catch(err => {
+            console.error('Image export failed:', err);
+            alert('Failed to export card image. Please try again.');
+        }).finally(() => {
+            downloadBtn.disabled = false;
+            downloadBtn.innerHTML = '<i class="fa-solid fa-download"></i> Export Card as PNG';
+        });
+    });
 
     // Submit form to API
     profileForm.addEventListener('submit', async (e) => {
@@ -124,6 +193,12 @@ document.addEventListener('DOMContentLoaded', () => {
         const bio = inputBio.value.trim();
         const avatar = inputAvatar.value.trim();
         const skills = inputSkills.value.trim();
+        
+        // Social handles
+        const github = inputGithub.value.trim();
+        const linkedin = inputLinkedin.value.trim();
+        const twitter = inputTwitter.value.trim();
+        const portfolio = inputPortfolio.value.trim();
         
         let theme = 'glass';
         themeRadios.forEach(radio => {
@@ -136,50 +211,40 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             const response = await fetch('/api/profile', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    name: name,
-                    job_title: title,
-                    bio: bio,
-                    avatar_url: avatar,
-                    skills: skills,
-                    theme: theme
+                    name, job_title: title, bio, avatar_url: avatar, skills, theme,
+                    github, linkedin, twitter, portfolio
                 })
             });
 
             if (!response.ok) throw new Error('Failed to save profile');
-
-            const result = await response.json();
             
-            // Reload registry history
             fetchHistory();
-            
-            // Reset form
             profileForm.reset();
-            
-            // Reset theme picker
             themeRadios[0].checked = true;
             
-            // Reset live card preview to defaults
+            // Reset preview
             cardName.textContent = 'Your Name';
             cardTitle.textContent = 'Professional Title';
             cardBio.textContent = 'Your story will appear here. Start typing in the form to see your card update live in real-time!';
             cardAvatar.classList.add('hidden');
             cardAvatarFallback.classList.remove('hidden');
             cardAvatarFallback.textContent = 'RS';
+            
+            // Reset social links inside preview
+            [linkGithub, linkLinkedin, linkTwitter, linkPortfolio].forEach(lnk => lnk.classList.add('hidden'));
+            
             updateCardSkills();
             updateCardTheme('glass');
             
-            alert('Profile saved to registry successfully!');
-
+            alert('Identity profile card saved to studio history!');
         } catch (error) {
             console.error('Error saving profile:', error);
             alert('Error saving profile. Please try again.');
         } finally {
             submitBtn.disabled = false;
-            submitBtn.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles"></i> Save to Studio History';
+            submitBtn.innerHTML = '<i class="fa-solid fa-save"></i> Save Profile';
         }
     });
 
@@ -202,7 +267,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Render history grid items
+    // Render registry cards
     function renderHistory(profiles) {
         historyGrid.innerHTML = '';
         
@@ -220,7 +285,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const item = document.createElement('div');
             item.className = 'history-card-item';
             
-            // Initials or Avatar
             let avatarHTML = '';
             if (profile.avatar_url && (profile.avatar_url.startsWith('http://') || profile.avatar_url.startsWith('https://'))) {
                 avatarHTML = `<img src="${escapeHTML(profile.avatar_url)}" alt="Avatar" class="history-avatar" onerror="this.outerHTML='<div class=&quot;history-fallback&quot;>${getInitials(profile.name)}</div>'">`;
@@ -237,43 +301,50 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
             `;
 
-            // Clicking a history card loads it back into preview for editing/inspection!
+            // Load profile values when clicked
             item.addEventListener('click', () => {
-                loadProfileIntoFormAndPreview(profile);
+                loadProfileIntoForm(profile);
             });
 
             historyGrid.appendChild(item);
         });
     }
 
-    // Load profile data into form and preview card
-    function loadProfileIntoFormAndPreview(profile) {
+    // Load values back to form & card
+    function loadProfileIntoForm(profile) {
         inputName.value = profile.name;
         inputTitle.value = profile.job_title;
         inputBio.value = profile.bio;
         inputAvatar.value = profile.avatar_url;
         inputSkills.value = profile.skills;
         
-        // Select matching radio
+        // Social handles
+        inputGithub.value = profile.github || '';
+        inputLinkedin.value = profile.linkedin || '';
+        inputTwitter.value = profile.twitter || '';
+        inputPortfolio.value = profile.portfolio || '';
+
         themeRadios.forEach(radio => {
-            if (radio.value === profile.theme) {
-                radio.checked = true;
-            }
+            if (radio.value === profile.theme) radio.checked = true;
         });
 
-        // Trigger updates
+        // Trigger previews
         updateCardName();
         updateCardTitle();
         updateCardBio();
         updateCardAvatar();
         updateCardSkills();
+        
+        updateSocialLink(inputGithub, linkGithub);
+        updateSocialLink(inputLinkedin, linkLinkedin);
+        updateSocialLink(inputTwitter, linkTwitter);
+        updateSocialLink(inputPortfolio, linkPortfolio);
+        
         updateCardTheme(profile.theme);
         
-        // Scroll to form configuration top
         document.querySelector('.workspace').scrollIntoView({ behavior: 'smooth' });
     }
 
-    // Escape HTML strings
     function escapeHTML(str) {
         return str
             .replace(/&/g, '&amp;')
@@ -283,7 +354,7 @@ document.addEventListener('DOMContentLoaded', () => {
             .replace(/'/g, '&#039;');
     }
 
-    // Initial load
+    // Init
     updateCardSkills();
     fetchHistory();
 });
