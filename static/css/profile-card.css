@@ -1,0 +1,218 @@
+/* Live Card Preview Panel */
+.preview-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 1.5rem 0;
+    min-height: 380px;
+}
+
+/* Premium Dynamic Profile Card details */
+.profile-card {
+    width: 310px;
+    border-radius: 24px;
+    overflow: hidden;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.45);
+    transition: var(--transition);
+    position: relative;
+    background: #111827;
+}
+
+.profile-card .card-inner {
+    padding: 2.25rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.avatar-container {
+    width: 96px;
+    height: 96px;
+    border-radius: 50%;
+    margin-bottom: 1.15rem;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.avatar-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.avatar-fallback {
+    font-family: 'Outfit', sans-serif;
+    font-size: 2.4rem;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+}
+
+.profile-name {
+    font-family: 'Outfit', sans-serif;
+    font-size: 1.45rem;
+    font-weight: 700;
+    margin-bottom: 0.25rem;
+    word-break: break-word;
+}
+
+.profile-role {
+    font-size: 0.88rem;
+    font-weight: 500;
+    margin-bottom: 1rem;
+    letter-spacing: 0.2px;
+}
+
+.profile-bio {
+    font-size: 0.84rem;
+    line-height: 1.5;
+    margin-bottom: 1.5rem;
+    word-break: break-word;
+}
+
+.skills-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.4rem;
+    margin-bottom: 1.5rem;
+    width: 100%;
+}
+
+.skill-badge {
+    font-size: 0.72rem;
+    font-weight: 600;
+    padding: 0.3rem 0.65rem;
+    border-radius: 30px;
+}
+
+.card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    padding-top: 1.15rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.brand-tag {
+    font-size: 0.72rem;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+.social-links {
+    display: flex;
+    gap: 0.65rem;
+}
+
+.social-links a {
+    font-size: 0.9rem;
+    transition: transform 0.2s;
+}
+
+.social-links a:hover {
+    transform: scale(1.15);
+}
+
+/* Theme 1: Glassmorphism details */
+.theme-glass {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+.theme-glass .profile-name { color: #ffffff; }
+.theme-glass .profile-role { color: #c084fc; }
+.theme-glass .profile-bio { color: #cbd5e1; }
+.theme-glass .skill-badge { background: rgba(255, 255, 255, 0.06); color: #e2e8f0; border: 1px solid rgba(255, 255, 255, 0.04); }
+.theme-glass .avatar-fallback { background: linear-gradient(135deg, #a855f7, #6366f1); color: white; }
+.theme-glass .brand-tag { color: #c084fc; }
+.theme-glass .social-links a { color: #94a3b8; }
+.theme-glass .social-links a:hover { color: white; }
+
+/* Theme 2: Dark Neon details */
+.theme-dark-neon {
+    background: #05070c;
+    border: 1.5px solid #00f2fe;
+}
+.theme-dark-neon .profile-name { color: #ffffff; text-shadow: 0 0 10px rgba(0, 242, 254, 0.4); }
+.theme-dark-neon .profile-role { color: #ff007f; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
+.theme-dark-neon .profile-bio { color: #94a3b8; }
+.theme-dark-neon .skill-badge { background: transparent; color: #00f2fe; border: 1px solid rgba(0, 242, 254, 0.3); }
+.theme-dark-neon .avatar-fallback { background: #00f2fe; color: #05070c; }
+.theme-dark-neon .brand-tag { color: #00f2fe; }
+.theme-dark-neon .social-links a { color: #ff007f; }
+.theme-dark-neon .social-links a:hover { color: #00f2fe; }
+.theme-dark-neon .card-footer { border-top-color: rgba(0, 242, 254, 0.15); }
+
+/* Theme 3: Royal Gold details */
+.theme-royal-gold {
+    background: #060b13;
+    border: 1.5px solid #d4af37;
+}
+.theme-royal-gold .profile-name { font-family: 'Playfair Display', serif; color: #dfb257; font-style: italic; font-weight: 600; }
+.theme-royal-gold .profile-role { color: #ffffff; font-weight: 300; letter-spacing: 2px; text-transform: uppercase; }
+.theme-royal-gold .profile-bio { color: #94a3b8; font-style: italic; }
+.theme-royal-gold .skill-badge { background: rgba(212, 175, 55, 0.08); color: #dfb257; border: 1px solid rgba(212, 175, 55, 0.25); }
+.theme-royal-gold .avatar-fallback { background: linear-gradient(135deg, #bf953f, #aa771c); color: #091322; }
+.theme-royal-gold .brand-tag { color: #dfb257; }
+.theme-royal-gold .social-links a { color: #dfb257; }
+.theme-royal-gold .social-links a:hover { color: #ffffff; }
+.theme-royal-gold .card-footer { border-top-color: rgba(212, 175, 55, 0.15); }
+
+/* Theme 4: Ocean Breeze details */
+.theme-ocean-breeze {
+    background: linear-gradient(135deg, #0369a1, #0f766e);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+}
+.theme-ocean-breeze .profile-name { color: #ffffff; }
+.theme-ocean-breeze .profile-role { color: #ccfbf1; font-weight: 600; }
+.theme-ocean-breeze .profile-bio { color: #e0f2fe; }
+.theme-ocean-breeze .skill-badge { background: rgba(255, 255, 255, 0.12); color: #ffffff; }
+.theme-ocean-breeze .avatar-fallback { background: #ffffff; color: #0369a1; }
+.theme-ocean-breeze .brand-tag { color: #ccfbf1; }
+.theme-ocean-breeze .social-links a { color: #ffffff; opacity: 0.8; }
+.theme-ocean-breeze .social-links a:hover { opacity: 1; }
+.theme-ocean-breeze .card-footer { border-top-color: rgba(255, 255, 255, 0.1); }
+
+/* Export action controls */
+.export-actions {
+    display: flex;
+    justify-content: center;
+    margin-top: 1.5rem;
+}
+
+.download-card-btn {
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: white;
+    border: none;
+    padding: 0.75rem 1.75rem;
+    border-radius: 50px;
+    font-weight: 600;
+    font-size: 0.88rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+    transition: var(--transition);
+}
+
+.download-card-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 22px rgba(16, 185, 129, 0.45);
+}
+
+.download-card-btn:active {
+    transform: translateY(0);
+}
+

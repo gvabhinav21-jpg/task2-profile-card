@@ -1,120 +1,24 @@
-import os
-import sqlite3
-from flask import Flask, request, jsonify, render_template
+import sys
+from pathlib import Path
 
-app = Flask(__name__, template_folder='templates', static_folder='static')
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-DB_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'profiles.db')
+from flask import Flask
 
-def get_db_connection():
-    conn = sqlite3.connect(DB_PATH)
-    conn.row_factory = sqlite3.Row
-    return conn
+from config import DEBUG, HOST, PORT
+from db import init_db
+from routes import bp
 
-def init_db():
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    # Re-initialize table with upgraded fields
-    cursor.execute('DROP TABLE IF EXISTS profiles')
-    cursor.execute('''
-        CREATE TABLE profiles (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            name TEXT NOT NULL,
-            job_title TEXT NOT NULL,
-            bio TEXT,
-            avatar_url TEXT,
-            skills TEXT,
-            theme TEXT DEFAULT 'glass',
-            github TEXT DEFAULT '',
-            linkedin TEXT DEFAULT '',
-            twitter TEXT DEFAULT '',
-            portfolio TEXT DEFAULT '',
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        )
-    ''')
-    conn.commit()
-    conn.close()
 
-@app.route('/')
-def index():
-    return render_template('index.html')
+def create_app():
+    app = Flask(__name__, template_folder="templates", static_folder="static")
+    app.register_blueprint(bp)
+    return app
 
-@app.route('/api/profiles', methods=['GET'])
-def get_profiles():
-    try:
-        conn = get_db_connection()
-        profiles = conn.execute('SELECT * FROM profiles ORDER BY id DESC').fetchall()
-        conn.close()
-        
-        profiles_list = []
-        for profile in profiles:
-            profiles_list.append({
-                'id': profile['id'],
-                'name': profile['name'],
-                'job_title': profile['job_title'],
-                'bio': profile['bio'],
-                'avatar_url': profile['avatar_url'],
-                'skills': profile['skills'],
-                'theme': profile['theme'],
-                'github': profile['github'],
-                'linkedin': profile['linkedin'],
-                'twitter': profile['twitter'],
-                'portfolio': profile['portfolio'],
-                'created_at': profile['created_at']
-            })
-        return jsonify(profiles_list)
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
 
-@app.route('/api/profile', methods=['POST'])
-def create_profile():
-    try:
-        data = request.get_json() or {}
-        name = data.get('name', '').strip()
-        job_title = data.get('job_title', '').strip()
-        bio = data.get('bio', '').strip()
-        avatar_url = data.get('avatar_url', '').strip()
-        skills = data.get('skills', '').strip()
-        theme = data.get('theme', 'glass').strip()
-        github = data.get('github', '').strip()
-        linkedin = data.get('linkedin', '').strip()
-        twitter = data.get('twitter', '').strip()
-        portfolio = data.get('portfolio', '').strip()
-        
-        if not name:
-            return jsonify({'error': 'Name is required'}), 400
-        if not job_title:
-            return jsonify({'error': 'Job Title is required'}), 400
-            
-        conn = get_db_connection()
-        cursor = conn.cursor()
-        cursor.execute('''
-            INSERT INTO profiles (name, job_title, bio, avatar_url, skills, theme, github, linkedin, twitter, portfolio)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        ''', (name, job_title, bio, avatar_url, skills, theme, github, linkedin, twitter, portfolio))
-        profile_id = cursor.lastrowid
-        conn.commit()
-        
-        profile = conn.execute('SELECT * FROM profiles WHERE id = ?', (profile_id,)).fetchone()
-        conn.close()
-        
-        return jsonify({
-            'id': profile['id'],
-            'name': profile['name'],
-            'job_title': profile['job_title'],
-            'bio': profile['bio'],
-            'avatar_url': profile['avatar_url'],
-            'skills': profile['skills'],
-            'theme': profile['theme'],
-            'github': profile['github'],
-            'linkedin': profile['linkedin'],
-            'twitter': profile['twitter'],
-            'portfolio': profile['portfolio'],
-            'created_at': profile['created_at']
-        }), 201
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
+app = create_app()
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     init_db()
-    app.run(host='127.0.0.1', port=5002, debug=True)
+    app.run(host=HOST, port=PORT, debug=DEBUG)
